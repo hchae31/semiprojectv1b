@@ -6,7 +6,7 @@ from starlette.templating import Jinja2Templates
 
 app = FastAPI()
 templates = Jinja2Templates(directory='views/templates')
-app.mount('/static', StaticFiles(directory='view/static'),name='static')
+app.mount('/static', StaticFiles(directory='views/static'),name='static')
 
 
 @app.get("/", response_class=HTMLResponse)
