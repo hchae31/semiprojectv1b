@@ -1,7 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 from starlette.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from app.dbfactory import get_db
+from app.schema.member import NewMember
+from app.service.member import MemberService
 
 member_router = APIRouter()
 templates = Jinja2Templates(directory='views/templates')
@@ -13,6 +17,12 @@ async def join(req: Request):
 @member_router.get('/login', response_class=HTMLResponse)
 async def login(req: Request):
     return templates.TemplateResponse('member/login.html', {'request': req})
+
+@member_router.post('/join', response_class=HTMLResponse)
+async def joinok(member: NewMember, db: Session = Depends(get_db)):
+    print(member)
+    result = MemberService.insert_member(db, member)
+    print('처리결과 : ', result.rowcount)
 
 @member_router.get('/myinfo', response_class=HTMLResponse)
 async def myinfo(req: Request):
