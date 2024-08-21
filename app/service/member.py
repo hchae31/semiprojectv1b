@@ -1,3 +1,4 @@
+import requests
 from sqlalchemy import insert
 
 from app.model.member import Member
@@ -17,5 +18,20 @@ class MemberService:
         except SQLAlchemyError as ex:
             print(f'▶▶▶ insert_member 오류발생: {str(ex)}')
             db.rollback()
+
+    # google recaptcha 확인 url
+    # https://www.google.com/recaptcha/api/siteverify?secret=비밀키&response=응답토큰
+    @staticmethod
+    def check_captcha(member):
+          # 클라이언트가 보낸 객체를 dict로 변환
+        req_url = 'https://www.google.com/recaptcha/api/siteverify'
+        params = { 'secret': '',
+                   'response': member.captcha }
+        res = requests.get(req_url, params=params)
+        result = res.json()
+        print('check => ', result)
+
+        return result['success']
+        # return True
 
 
