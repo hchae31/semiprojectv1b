@@ -22,7 +22,7 @@ templates = Jinja2Templates(directory='views/templates')
 async def list(req: Request, cpg: int, db: Session = Depends(get_db)):
     try:
         bdlist = BoardService.select_board(db, cpg)
-        return templates.TemplateResponse('board/list.html', {'request': req, 'bdlist': bdlist})
+        return templates.TemplateResponse('board/list.html', {'request': req, 'bdlist': bdlist, 'cpg':cpg})
 
     except Exception as ex:
         print(f'▷▷▷ list 오류 발생 : {str(ex)}')
