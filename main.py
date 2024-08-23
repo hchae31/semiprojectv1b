@@ -1,13 +1,15 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
+from app.dbfactory import db_startup, db_shutdown
+from app.routes.board import board_router
 from app.routes.member import member_router
-from app.service.dbfactory import db_startup, db_shutdown
 
 
 @asynccontextmanager
@@ -16,16 +18,24 @@ async def lifespan(app: FastAPI):
     yield
     await db_shutdown()
 
+
 app = FastAPI(lifespan=lifespan)
-app = FastAPI()
+
+# 세션처리를 위해 미들웨어 설정
+# pip install itsdangerous
+app.add_middleware(SessionMiddleware, secret_key='6LeJoCsqAAAAAIeyH5d9fROlsEscMIc2QbQyBg7j')
+
 templates = Jinja2Templates(directory='views/templates')
 app.mount('/static', StaticFiles(directory='views/static'),name='static')
 
 app.include_router(member_router, prefix='/member')
+app.include_router(board_router, prefix='/board')
+
 
 @app.get("/", response_class=HTMLResponse)
 async def index(req: Request):
     return templates.TemplateResponse('index.html', {'request': req})
+
 
 if __name__ == '__main__':
     import uvicorn
