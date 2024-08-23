@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.model import member, board
 from app.settings import config
 
 engine = create_engine(config.dbconn, echo=True)
@@ -15,7 +16,8 @@ def get_db():
         db.close()
 
 async def db_startup():
-    pass
+    member.Base.metadata.create_all(engine)
+    board.Base.metadata.create_all(engine)
 
 async def db_shutdown():
     pass
